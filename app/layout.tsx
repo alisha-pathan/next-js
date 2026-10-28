@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -23,7 +25,39 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <nav className="flex items-center justify-between border-b border-gray-200 px-8 py-4">
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/next.svg"
+              alt="Next.js logo"
+              width={100}
+              height={25}
+              priority
+            />
+          </Link>
+
+          {/* Right: Navigation */}
+          <div className="flex items-center gap-8">
+            <Link
+              href="/"
+              className="text-sm font-medium text-gray-700 transition-colors hover:text-black"
+            >
+              Home
+            </Link>
+
+            <Link
+              href="/post"
+              className="text-sm font-medium text-gray-700 transition-colors hover:text-black"
+            >
+              Post
+            </Link>
+          </div>
+        </nav>
+
+        <main className="flex-1">{children}</main>
+      </body>
     </html>
   );
 }
