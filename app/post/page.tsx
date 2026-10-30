@@ -1,24 +1,21 @@
-
 import { Suspense } from "react";
 import Link from "next/link";
+import prisma from "@/lib/prisma";
+import CreatePostForm from "./create-post-form";
+import EditPostForm from "../api/posts/edit-post-form";
+import DeletePostButton from "./delete-post-button";
 
-type Post = {
-  userId: number;
-  id: number;
-  title: string;
-  body: string;
-};
 
 async function PostsList() {
-  const response = await fetch(
-    "https://jsonplaceholder.typicode.com/posts"
-  );
+  const posts = await prisma.post.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch posts");
+  if (posts.length === 0) {
+    return <p className="mt-6">No posts found in the database.</p>;
   }
-
-  const posts: Post[] = await response.json();
 
   return (
     <ul className="mt-6 space-y-4">
@@ -27,14 +24,31 @@ async function PostsList() {
           key={post.id}
           className="rounded-lg border border-gray-200 p-4"
         >
-          <Link
-            href={`/post/${post.id}`}
-            className="text-lg font-semibold capitalize text-blue-600 hover:underline"
-          >
-            {post.title}
-          </Link>
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={post.isAvailable}
+              readOnly
+              aria-label={`Availability of ${post.title}`}
+            />
+
+            <Link
+              href={`/post/${post.id}`}
+              className="text-lg font-semibold capitalize text-blue-600 hover:underline"
+            >
+              {post.title}
+            </Link>
+          </div>
 
           <p className="mt-2 text-gray-600">{post.body}</p>
+
+          <div className="mt-4 flex gap-2">
+            <EditPostForm post={post} />
+            <DeletePostButton
+              postId={post.id}
+              postTitle={post.title}
+            />
+          </div>
         </li>
       ))}
     </ul>
@@ -49,6 +63,8 @@ export default function PostPage() {
       <p className="mt-3 text-gray-600">
         Welcome to the posts page.
       </p>
+
+      <CreatePostForm />
 
       <Suspense
         fallback={<p className="mt-6">Loading posts...</p>}

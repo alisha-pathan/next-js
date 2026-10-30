@@ -12,5 +12,6 @@ model Post {
   id        Int      @id @default(autoincrement())
   title     String
   body      String
+  isAvailable Boolean  @default(false)
   createdAt DateTime @default(now())
 }
