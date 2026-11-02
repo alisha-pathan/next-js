@@ -1,3 +1,7 @@
+// app/post/[id]/page.tsx
+// Post detail page at "/post/[id]": shows a single post by its ID.
+// Calls notFound() when the ID is invalid or the post does not exist.
+
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";

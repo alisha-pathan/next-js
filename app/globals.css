@@ -1,3 +1,9 @@
+/*
+ * app/globals.css
+ * Global stylesheet loaded once by the root layout.
+ * Imports Tailwind CSS and defines site-wide theme variables.
+ */
+
 @import "tailwindcss";
 
 :root {

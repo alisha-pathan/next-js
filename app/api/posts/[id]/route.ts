@@ -1,3 +1,6 @@
+// app/api/posts/[id]/route.ts
+// API route for "/api/posts/[id]".
+// PUT updates a post and DELETE removes it, after validating the ID.
 
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";

@@ -1,3 +1,7 @@
+// components/posts/create-post-form.tsx
+// "Add Post" button that opens a modal form to create a post.
+// Sends a POST to /api/posts and refreshes the list on success.
+
 "use client";
 
 import { useState, type FormEvent } from "react";

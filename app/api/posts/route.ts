@@ -1,3 +1,7 @@
+// app/api/posts/route.ts
+// API route for "/api/posts".
+// POST: validates the title and body, then creates a new post.
+
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 

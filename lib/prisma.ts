@@ -1,3 +1,6 @@
+// lib/prisma.ts
+// Creates the shared Prisma client connected to PostgreSQL.
+// Import this wherever the app needs to read or write the database.
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/app/generated/prisma/client";

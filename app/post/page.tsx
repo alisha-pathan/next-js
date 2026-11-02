@@ -1,3 +1,7 @@
+// app/post/page.tsx
+// Posts page at "/post": lists all posts from the database, newest first.
+// Lets users create, edit and delete posts through the post components.
+
 import { Suspense } from "react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";

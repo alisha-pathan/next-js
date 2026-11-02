@@ -1,3 +1,6 @@
+// components/layout/footer.tsx
+// Site footer shown on every page.
+// Displays the copyright year and a short "built with" note.
 
 "use client";
 

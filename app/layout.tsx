@@ -1,3 +1,7 @@
+// app/layout.tsx
+// Root layout shared by every page: loads fonts and global styles.
+// Wraps all routes with the site Header and Footer.
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";

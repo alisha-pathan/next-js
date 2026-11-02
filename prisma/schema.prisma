@@ -1,3 +1,6 @@
+// prisma/schema.prisma
+// Prisma schema: database provider, client generator and data models.
+// Edit this to change tables, then run a migration to apply it.
 
 generator client {
   provider = "prisma-client"

@@ -1,3 +1,6 @@
+// components/posts/delete-post-button.tsx
+// "Delete" button that asks for confirmation in a modal.
+// Sends a DELETE to /api/posts/[id] and refreshes the list on success.
 
 "use client";
 

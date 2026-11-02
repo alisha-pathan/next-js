@@ -1,3 +1,6 @@
+// app/db-posts/page.tsx
+// Read-only page at "/db-posts" that lists every post in PostgreSQL.
+// Simple example of fetching data with Prisma in a server component.
 
 import { Suspense } from "react";
 import prisma from "@/lib/prisma";

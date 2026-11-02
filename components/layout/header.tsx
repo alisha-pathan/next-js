@@ -1,3 +1,7 @@
+// components/layout/header.tsx
+// Site header shown on every page.
+// Displays the Next.js logo and navigation links (Home, Post).
+
 import Link from "next/link";
 import Image from "next/image";
 

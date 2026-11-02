@@ -1,3 +1,6 @@
+// components/posts/edit-post-form.tsx
+// "Edit" button that opens a modal form pre-filled with a post's data.
+// Sends a PUT to /api/posts/[id] and refreshes the list on success.
 
 "use client";
 
