@@ -5,6 +5,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import BackLink from "@/components/ui/back-link";
 
 type PostPageProps = {
   params: Promise<{ id: string }>;
@@ -29,7 +30,7 @@ async function PostDetails({ params }: PostPageProps) {
   }
 
   return (
-    <section className="px-8 py-12">
+    <>
       <h1 className="text-3xl font-bold">{post.title}</h1>
 
       <div className="mt-6 space-y-3">
@@ -48,7 +49,7 @@ async function PostDetails({ params }: PostPageProps) {
           Created: {post.createdAt.toLocaleString()}
         </p>
       </div>
-    </section>
+    </>
   );
 }
 
@@ -56,8 +57,14 @@ export default function PostDetailPage({
   params,
 }: PostPageProps) {
   return (
-    <Suspense fallback={<p className="p-8">Loading post...</p>}>
-      <PostDetails params={params} />
-    </Suspense>
+    <section className="px-8 py-12">
+      <div className="mb-6">
+        <BackLink href="/post" label="Back to posts" />
+      </div>
+
+      <Suspense fallback={<p>Loading post...</p>}>
+        <PostDetails params={params} />
+      </Suspense>
+    </section>
   );
 }
