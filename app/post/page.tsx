@@ -1,62 +1,26 @@
 // app/post/page.tsx
 // Posts page at "/post": lists all posts from the database, newest first.
-// Lets users create, edit and delete posts through the post components.
+// Lets users create, edit, delete and bulk-update availability through the post components.
 
 import { Suspense } from "react";
-import Link from "next/link";
 import prisma from "@/lib/prisma";
-import CreatePostForm from "@/components/posts/create-post-form";
-import EditPostForm from "@/components/posts/edit-post-form";
-import DeletePostButton from "@/components/posts/delete-post-button";
+import PostsList from "@/components/posts/posts-list";
 
 
-async function PostsList() {
+async function Posts() {
   const posts = await prisma.post.findMany({
     orderBy: {
       createdAt: "desc",
     },
+    select: {
+      id: true,
+      title: true,
+      body: true,
+      isAvailable: true,
+    },
   });
 
-  if (posts.length === 0) {
-    return <p className="mt-6">No posts found in the database.</p>;
-  }
-
-  return (
-    <ul className="mt-6 space-y-4">
-      {posts.map((post) => (
-        <li
-          key={post.id}
-          className="rounded-lg border border-gray-200 p-4"
-        >
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={post.isAvailable}
-              readOnly
-              aria-label={`Availability of ${post.title}`}
-            />
-
-            <Link
-              href={`/post/${post.id}`}
-              className="text-lg font-semibold capitalize text-blue-600 hover:underline"
-            >
-              {post.title}
-            </Link>
-          </div>
-
-          <p className="mt-2 text-gray-600">{post.body}</p>
-
-          <div className="mt-4 flex gap-2">
-            <EditPostForm post={post} />
-            <DeletePostButton
-              postId={post.id}
-              postTitle={post.title}
-            />
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
+  return <PostsList posts={posts} />;
 }
 
 export default function PostPage() {
@@ -68,12 +32,10 @@ export default function PostPage() {
         Welcome to the posts page.
       </p>
 
-      <CreatePostForm />
-
       <Suspense
-        fallback={<p className="mt-6">Loading posts...</p>}
+        fallback={<p className="mt-8">Loading posts...</p>}
       >
-        <PostsList />
+        <Posts />
       </Suspense>
     </section>
   );

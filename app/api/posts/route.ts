@@ -1,6 +1,6 @@
 // app/api/posts/route.ts
 // API route for "/api/posts".
-// POST: validates the title and body, then creates a new post.
+// POST: validates the title and body, then creates a new post (with isAvailable).
 
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
@@ -15,6 +15,8 @@ export async function POST(request: Request) {
     const content =
       typeof body.body === "string" ? body.body.trim() : "";
 
+    const isAvailable = body.isAvailable === true;
+
     if (!title || !content) {
       return NextResponse.json(
         { error: "Title and body are required." },
@@ -26,6 +28,7 @@ export async function POST(request: Request) {
       data: {
         title,
         body: content,
+        isAvailable,
       },
     });
 

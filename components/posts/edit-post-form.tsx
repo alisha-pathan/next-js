@@ -12,6 +12,7 @@ type EditPostFormProps = {
         id: number;
         title: string;
         body: string;
+        isAvailable: boolean;
     };
 };
 
@@ -20,12 +21,14 @@ export default function EditPostForm({ post }: EditPostFormProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [title, setTitle] = useState(post.title);
     const [body, setBody] = useState(post.body);
+    const [isAvailable, setIsAvailable] = useState(post.isAvailable);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     function openModal() {
         setTitle(post.title);
         setBody(post.body);
+        setIsAvailable(post.isAvailable);
         setError("");
         setIsOpen(true);
     }
@@ -45,7 +48,7 @@ export default function EditPostForm({ post }: EditPostFormProps) {
             const response = await fetch(`/api/posts/${post.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, body }),
+                body: JSON.stringify({ title, body, isAvailable }),
             });
 
             const responseText = await response.text();
@@ -148,6 +151,20 @@ export default function EditPostForm({ post }: EditPostFormProps) {
                                     className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 outline-none focus:border-blue-500"
                                 />
                             </div>
+
+                            <label
+                                htmlFor={`edit-available-${post.id}`}
+                                className="flex items-center gap-2 font-medium"
+                            >
+                                <input
+                                    id={`edit-available-${post.id}`}
+                                    type="checkbox"
+                                    checked={isAvailable}
+                                    onChange={(event) => setIsAvailable(event.target.checked)}
+                                    className="h-4 w-4"
+                                />
+                                Available
+                            </label>
 
                             {error && (
                                 <p role="alert" className="text-sm text-red-600">

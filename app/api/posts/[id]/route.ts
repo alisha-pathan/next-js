@@ -40,6 +40,10 @@ export async function PUT(
             typeof body.title === "string" ? body.title.trim() : "";
         const content =
             typeof body.body === "string" ? body.body.trim() : "";
+        const isAvailable =
+            typeof body.isAvailable === "boolean"
+                ? body.isAvailable
+                : existingPost.isAvailable;
 
         if (!title || !content) {
             return NextResponse.json(
@@ -50,7 +54,7 @@ export async function PUT(
 
         const post = await prisma.post.update({
             where: { id: postId },
-            data: { title, body: content },
+            data: { title, body: content, isAvailable },
         });
 
         return NextResponse.json(post);

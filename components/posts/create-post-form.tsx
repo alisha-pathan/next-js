@@ -12,6 +12,7 @@ export default function CreatePostForm() {
     const [isOpen, setIsOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
+    const [isAvailable, setIsAvailable] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -21,6 +22,7 @@ export default function CreatePostForm() {
         setIsOpen(false);
         setTitle("");
         setBody("");
+        setIsAvailable(false);
         setError("");
     }
 
@@ -33,7 +35,7 @@ export default function CreatePostForm() {
             const response = await fetch("/api/posts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, body }),
+                body: JSON.stringify({ title, body, isAvailable }),
             });
 
             const responseText = await response.text();
@@ -56,6 +58,7 @@ export default function CreatePostForm() {
             setIsOpen(false);
             setTitle("");
             setBody("");
+            setIsAvailable(false);
             router.refresh();
         } catch (error) {
             setError(
@@ -71,7 +74,7 @@ export default function CreatePostForm() {
             <button
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="mt-6 inline-block leading-tight rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white hover:bg-blue-700"
+                className="rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
                 + Add Post
             </button>
@@ -134,6 +137,17 @@ export default function CreatePostForm() {
                                     placeholder="Write your post"
                                 />
                             </div>
+
+                            <label htmlFor="isAvailable" className="flex items-center gap-2 font-medium">
+                                <input
+                                    id="isAvailable"
+                                    type="checkbox"
+                                    checked={isAvailable}
+                                    onChange={(event) => setIsAvailable(event.target.checked)}
+                                    className="h-4 w-4"
+                                />
+                                Available
+                            </label>
 
                             {error && (
                                 <p role="alert" className="text-sm text-red-600">
