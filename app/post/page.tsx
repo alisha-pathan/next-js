@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import CreatePostForm from "./create-post-form";
-import EditPostForm from "../api/posts/edit-post-form";
-import DeletePostButton from "./delete-post-button";
+import CreatePostForm from "@/components/posts/create-post-form";
+import EditPostForm from "@/components/posts/edit-post-form";
+import DeletePostButton from "@/components/posts/delete-post-button";
 
 
 async function PostsList() {
