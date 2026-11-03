@@ -2,16 +2,13 @@
 // Site footer shown on every page.
 // Displays the copyright year and a short "built with" note.
 
-"use client";
+import { cacheLife } from "next/cache";
 
-import { useEffect, useState } from "react";
+export default async function Footer() {
+  "use cache";
+  cacheLife("days");
 
-export default function Footer() {
-  const [year, setYear] = useState(2026);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
+  const year = new Date().getFullYear();
 
   return (
     <footer className="border-t border-gray-200 bg-gray-50">
