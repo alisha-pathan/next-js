@@ -14,9 +14,9 @@ export default function Header() {
           <Image
             src="/next.svg"
             alt="Next.js logo"
-            width={100}
-            height={25}
-            priority
+            width={98}
+            height={20}
+            style={{ height: "auto" }}
           />
         </Link>
 

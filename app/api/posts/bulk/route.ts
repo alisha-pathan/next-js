@@ -1,66 +1,35 @@
 // app/api/posts/bulk/route.ts
-// API route for "/api/posts/bulk".
+// API route for "/api/posts/bulk" (for external clients; the app's own UI uses Server Actions).
 // PATCH: takes { updates: [{ id, isAvailable }] } and saves every post's availability in one transaction.
 
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
+import { tagsForPost, updateAvailability } from "@/lib/data/posts";
+import { parseAvailabilityUpdates } from "@/lib/validations/post";
+import { readJsonBody } from "@/lib/http";
 
 export async function PATCH(request: Request) {
   try {
-    const body = await request.json();
-    const updates: unknown[] = Array.isArray(body.updates) ? body.updates : [];
+    const { body, errorResponse } = await readJsonBody(request);
+    if (errorResponse) return errorResponse;
 
-    const availableIds: number[] = [];
-    const unavailableIds: number[] = [];
+    const { updates } = (body ?? {}) as { updates?: unknown };
+    const parsed = parseAvailabilityUpdates(updates);
 
-    for (const update of updates) {
-      const { id, isAvailable } = (update ?? {}) as {
-        id?: unknown;
-        isAvailable?: unknown;
-      };
-
-      if (
-        typeof id !== "number" ||
-        !Number.isSafeInteger(id) ||
-        id < 1 ||
-        typeof isAvailable !== "boolean"
-      ) {
-        return NextResponse.json(
-          { error: "Each update needs a valid post ID and isAvailable true/false." },
-          { status: 400 }
-        );
-      }
-
-      (isAvailable ? availableIds : unavailableIds).push(id);
+    if (parsed.error !== undefined) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
-    if (updates.length === 0) {
-      return NextResponse.json(
-        { error: "At least one update is required." },
-        { status: 400 }
-      );
-    }
+    const count = await updateAvailability(parsed.data);
 
-    const [madeAvailable, madeUnavailable] = await prisma.$transaction([
-      prisma.post.updateMany({
-        where: { id: { in: availableIds } },
-        data: { isAvailable: true },
-      }),
-      prisma.post.updateMany({
-        where: { id: { in: unavailableIds } },
-        data: { isAvailable: false },
-      }),
-    ]);
+    new Set(parsed.data.flatMap(({ id }) => tagsForPost(id))).forEach((tag) =>
+      revalidateTag(tag, { expire: 0 })
+    );
 
-    return NextResponse.json({
-      count: madeAvailable.count + madeUnavailable.count,
-    });
+    return NextResponse.json({ count });
   } catch (error) {
     console.error("Failed to bulk update posts:", error);
 
-    return NextResponse.json(
-      { error: "Failed to update posts." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update posts." }, { status: 500 });
   }
 }

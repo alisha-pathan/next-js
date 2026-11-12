@@ -1,0 +1,13 @@
+# Generated or managed by tools
+.next/
+node_modules/
+app/generated/
+prisma/migrations/
+package-lock.json
+skills-lock.json
+next-env.d.ts
+
+# AI tool folders
+.agents/
+.claude/
+.windsurf/

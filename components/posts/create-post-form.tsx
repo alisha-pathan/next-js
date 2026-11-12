@@ -1,182 +1,64 @@
 // components/posts/create-post-form.tsx
-// "Add Post" button that opens a modal form to create a post.
-// Sends a POST to /api/posts and refreshes the list on success.
+// "Add Post" button that opens an antd Modal with the post form.
+// Calls the createPostAction Server Action; the list updates through cache invalidation.
 
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { App, Button, Form, Modal } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import PostForm, { type PostFormValues } from "./post-form";
+import { createPostAction } from "@/app/post/actions";
 
 export default function CreatePostForm() {
-    const router = useRouter();
-    const [isOpen, setIsOpen] = useState(false);
-    const [title, setTitle] = useState("");
-    const [body, setBody] = useState("");
-    const [isAvailable, setIsAvailable] = useState(false);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+  const { message } = App.useApp();
+  const [form] = Form.useForm<PostFormValues>();
+  const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [pending, startTransition] = useTransition();
 
-    function closeModal() {
-        if (loading) return;
+  function handleFinish(values: PostFormValues) {
+    setError("");
+    startTransition(async () => {
+      const result = await createPostAction(values);
 
+      if (result.error) {
+        setError(result.error);
+      } else {
         setIsOpen(false);
-        setTitle("");
-        setBody("");
-        setIsAvailable(false);
-        setError("");
-    }
+        message.success("Post created.");
+      }
+    });
+  }
 
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        setError("");
-        setLoading(true);
+  return (
+    <>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => {
+          setError("");
+          setIsOpen(true);
+        }}
+      >
+        Add Post
+      </Button>
 
-        try {
-            const response = await fetch("/api/posts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, body, isAvailable }),
-            });
-
-            const responseText = await response.text();
-
-            let result: { error?: string };
-
-            try {
-                result = JSON.parse(responseText);
-            } catch {
-                console.error("Expected JSON but received:", responseText);
-                throw new Error(
-                    `The server returned an unexpected response (HTTP ${response.status}). Check the Network tab.`
-                );
-            }
-
-            if (!response.ok) {
-                throw new Error(result.error || "Failed to create post.");
-            }
-
-            setIsOpen(false);
-            setTitle("");
-            setBody("");
-            setIsAvailable(false);
-            router.refresh();
-        } catch (error) {
-            setError(
-                error instanceof Error ? error.message : "Something went wrong."
-            );
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    return (
-        <>
-            <button
-                type="button"
-                onClick={() => setIsOpen(true)}
-                className="rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-                + Add Post
-            </button>
-
-            {isOpen && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-                    onClick={closeModal}
-                >
-                    <div
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="create-post-title"
-                        className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl"
-                        onClick={(event) => event.stopPropagation()}
-                    >
-                        <div className="flex items-center justify-between">
-                            <h2 id="create-post-title" className="text-xl font-bold">
-                                Create Post
-                            </h2>
-
-                            <button
-                                type="button"
-                                onClick={closeModal}
-                                disabled={loading}
-                                aria-label="Close modal"
-                                className="text-2xl text-gray-500 hover:text-gray-800 disabled:opacity-50"
-                            >
-                                &times;
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-                            <div>
-                                <label htmlFor="title" className="mb-1 block font-medium">
-                                    Title
-                                </label>
-                                <input
-                                    id="title"
-                                    value={title}
-                                    onChange={(event) => setTitle(event.target.value)}
-                                    required
-                                    maxLength={200}
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 outline-none focus:border-blue-500"
-                                    placeholder="Enter post title"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="body" className="mb-1 block font-medium">
-                                    Body
-                                </label>
-                                <textarea
-                                    id="body"
-                                    value={body}
-                                    onChange={(event) => setBody(event.target.value)}
-                                    required
-                                    rows={5}
-                                    className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 outline-none focus:border-blue-500"
-                                    placeholder="Write your post"
-                                />
-                            </div>
-
-                            <label htmlFor="isAvailable" className="flex items-center gap-2 font-medium">
-                                <input
-                                    id="isAvailable"
-                                    type="checkbox"
-                                    checked={isAvailable}
-                                    onChange={(event) => setIsAvailable(event.target.checked)}
-                                    className="h-4 w-4"
-                                />
-                                Available
-                            </label>
-
-                            {error && (
-                                <p role="alert" className="text-sm text-red-600">
-                                    {error}
-                                </p>
-                            )}
-
-                            <div className="flex justify-end gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={closeModal}
-                                    disabled={loading}
-                                    className="rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-100 disabled:opacity-50"
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-                                >
-                                    {loading ? "Creating..." : "Create Post"}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </>
-    );
+      <Modal
+        title="Create Post"
+        open={isOpen}
+        okText="Create Post"
+        confirmLoading={pending}
+        onOk={() => form.submit()}
+        onCancel={() => setIsOpen(false)}
+        cancelButtonProps={{ disabled: pending }}
+        closable={!pending}
+        keyboard={!pending}
+        mask={{ closable: !pending }}
+        destroyOnHidden
+      >
+        <PostForm form={form} error={error} onFinish={handleFinish} />
+      </Modal>
+    </>
+  );
 }

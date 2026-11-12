@@ -1,16 +1,22 @@
 // app/post/[id]/not-found.tsx
-// Not-found UI for "/post/[id]".
+// Not-found UI for "/post/[id]", using antd's 404 Result.
 // Rendered when a post ID is invalid or no matching post exists.
 
-import BackLink from "@/components/ui/back-link";
+import { Result } from "antd";
+import { ArrowLeftOutlined } from "@/components/antd";
+import LinkButton from "@/components/navigation/link-button";
 
 export default function NotFound() {
   return (
-    <div className="px-8 py-12">
-      <div className="mb-6">
-        <BackLink href="/post" label="Back to posts" />
-      </div>
-      <p>Post not found...</p>
-    </div>
+    <Result
+      status="404"
+      title="Post not found"
+      subTitle="This post doesn't exist or may have been deleted."
+      extra={
+        <LinkButton type="primary" href="/post" icon={<ArrowLeftOutlined />}>
+          Back to posts
+        </LinkButton>
+      }
+    />
   );
 }
